@@ -1217,16 +1217,25 @@ document.getElementById('year').textContent = new Date().getFullYear();
     var overlay = document.createElement('div');
     overlay.className = 'gallery-overlay';
 
-    // Si la imagen no carga, muestra un placeholder con gradiente y emoji
+    // Si la imagen no carga, reintenta 2 veces antes de mostrar el fallback.
     img.onerror = (function (grad, emoji) {
+      var retries = 0;
       return function () {
-        img.style.display = 'none';
-        wrap.style.background = grad;
-        wrap.style.display = 'flex';
-        wrap.style.alignItems = 'center';
-        wrap.style.justifyContent = 'center';
-        wrap.style.fontSize = '3rem';
-        wrap.textContent = emoji;
+        if (retries < 2) {
+          retries++;
+          // 'this' se refiere al elemento img.
+          // Se agrega un parámetro a la URL para evitar la caché.
+          this.src = this.src.split('?')[0] + '?raw=true&retry=' + retries;
+        } else {
+          // Si todos los reintentos fallan, muestra el placeholder.
+          this.style.display = 'none';
+          wrap.style.background = grad;
+          wrap.style.display = 'flex';
+          wrap.style.alignItems = 'center';
+          wrap.style.justifyContent = 'center';
+          wrap.style.fontSize = '3rem';
+          wrap.textContent = emoji;
+        }
       };
     })(fallbackGradients[i], fallbackEmojis[i]);
 
@@ -1289,23 +1298,21 @@ document.getElementById('year').textContent = new Date().getFullYear();
     btn.disabled = true;
     btn.innerHTML = '<div class="spinner"></div> Preparando reserva\u2026';
 
-    /* Procesamiento simulado y redirección */
+    /* Procesamiento y redirección */
     var text =
       'Hola! Me gustaria reservar un turno para ' + service +
       ' el d\u00EDa ' + formatDate(date) +
       ' a las ' + time + 'hs - ' + 'Me podes confirmar Disponibilidad. Mi nombre es ' + name;
       
-    setTimeout(function () {
-      window.open(
-        'https://wa.me/3814486919?text=' + encodeURIComponent(text),
-        '_blank'
-      );
+    window.open(
+      'https://wa.me/3814486919?text=' + encodeURIComponent(text),
+      '_blank'
+    );
       
-      // Restauramos el botón a la normalidad
+    // Restauramos el botón después de un momento
+    setTimeout(function () {
       btn.disabled = false;
       btn.textContent = 'Reservar por WhatsApp';
-      
-      // Descomenta la siguiente línea si quieres que el formulario se vacíe al enviarlo:
       // document.getElementById('booking-form').reset();
     }, 800);
   });

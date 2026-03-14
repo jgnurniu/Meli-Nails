@@ -973,7 +973,7 @@ footer {
 
   <!-- JavaScript -->
   <script>
-    /* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════
    script.js — Meli Nails
    Toda la lógica de interacción en JS puro
    ═══════════════════════════════════════════ */
@@ -1085,10 +1085,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
   dateInput.min = yyyy + '-' + mm + '-' + dd;
 
   /* Helpers */
-  function val(id) {
-    return document.getElementById(id).value.trim();
-  }
-
   function setError(fieldId, hasError) {
     var errEl = document.getElementById('err-' + fieldId);
     var inpEl = document.getElementById('f-' + fieldId);
@@ -1113,7 +1109,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
   document.getElementById('booking-form').addEventListener('submit', function (ev) {
     ev.preventDefault();
 
-    var name    = val('name');
+    var name    = document.getElementById('f-name').value.trim();
     var service = document.getElementById('f-service').value;
     var date    = document.getElementById('f-date').value;
     var time    = document.getElementById('f-time').value;
@@ -1129,25 +1125,29 @@ document.getElementById('year').textContent = new Date().getFullYear();
     /* Estado de carga */
     var btn = document.getElementById('submit-btn');
     btn.disabled = true;
-    btn.innerHTML =
-      '<div class="spinner"></div> Preparando reserva\u2026';
+    btn.innerHTML = '<div class="spinner"></div> Preparando reserva\u2026';
 
-    /* Simula 800 ms de procesamiento (igual que el componente React) */
+    /* Procesamiento simulado y redirección */
+    var text =
+      'Hola! Me gustaria reservar un turno para ' + service +
+      ' el d\u00EDa ' + formatDate(date) +
+      ' a las ' + time + 'hs - ' + 'Me podes confirmar Disponibilidad. Mi nombre es' + name;
+      
     setTimeout(function () {
-      var text =
-        'Hola! Quiero reservar un turno para ' + service +
-        ' el d\u00EDa ' + formatDate(date) +
-        ' a las ' + time + 'hs - ' + name;
       window.open(
         'https://wa.me/3814486919?text=' + encodeURIComponent(text),
         '_blank'
       );
+      
+      // Restauramos el botón a la normalidad
       btn.disabled = false;
       btn.textContent = 'Reservar por WhatsApp';
+      
+      // Descomenta la siguiente línea si quieres que el formulario se vacíe al enviarlo:
+      // document.getElementById('booking-form').reset();
     }, 800);
   });
 })();
-
   </script>
   
 </body></html>
